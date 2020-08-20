@@ -187,9 +187,15 @@ import flash.desktop.NativeApplication;
 		{
 			// initialize RemoteConfig only once in your app
 			RemoteConfig.init();
-			
-			// when developing, set this to true so the developer mode will be on
-			RemoteConfig.setConfigSettings(true);
+
+			// RemoteConfigSettings can be used to configure how Remote Config operates.
+			var mySettings:RemoteConfigSettings = new RemoteConfigSettings();
+			mySettings.setDeveloperModeEnabled(true);
+			mySettings.setFetchTimeoutInSeconds(60);
+			mySettings.setMinimumFetchIntervalInSeconds(12*60*60);
+
+			// Set the configuration settings for this RemoteConfig instance.
+			RemoteConfig.setConfigSettingsAsync(mySettings);
 			
 			// create an object with the following format (key/value) and add all your default values to it.
 			var myDefaults:Object = {};
@@ -271,6 +277,28 @@ import flash.desktop.NativeApplication;
 				C.log("value = " + value);
 				trace("value = " + value);
 			}
+
+			var btn4:MySprite = createBtn("fetchAndActivate");
+			btn4.addEventListener(MouseEvent.CLICK, fetchAndActivate);
+			_list.add(btn4);
+
+			function fetchAndActivate(e:MouseEvent):void
+			{
+				RemoteConfig.fetchAndActivate(function ($error:Error):void
+				{
+					if($error)
+					{
+						C.log($error.message);
+						trace($error.message);
+					}
+					else
+					{
+						C.log("Fetch and activate was successful!");
+						trace("Fetch and activate was successful!");
+					}
+				});
+			}
+
 		}
 
 		private function createBtn($str:String):MySprite
